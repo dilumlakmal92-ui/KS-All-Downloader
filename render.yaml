@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: nexus-video-studio
+    runtime: python
+    plan: free
+    buildCommand: |
+      pip install -r requirements.txt
+      apt-get install -y ffmpeg 2>/dev/null || true
+    startCommand: gunicorn web_app:app --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 300
+    envVars:
+      - key: DOWNLOAD_DIR
+        value: /tmp/nexus_downloads
+      - key: PORT
+        fromService:
+          type: web
+          name: nexus-video-studio
+          property: port
